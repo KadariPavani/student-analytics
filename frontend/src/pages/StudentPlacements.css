@@ -1,0 +1,188 @@
+/* ── Tab navigation ── */
+.sp-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Download button */
+.btn--secondary {
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn--secondary:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.btn--secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sp-tab {
+  padding: 10px 22px;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.sp-tab:hover {
+  color: var(--primary);
+}
+
+.sp-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ── Pagination (shared) ── */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 4px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ── Placement-specific filters ── */
+.placement-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.placement-filters .filter-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.875rem;
+}
+
+.placement-filters .filter-search:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.placement-filters select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  outline: none;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* ── Mobile responsive ── */
+@media (max-width: 768px) {
+  .btn--secondary {
+    padding: 7px 12px;
+    font-size: 0.75rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .sp-tabs {
+    margin-bottom: 14px;
+    gap: 0;
+  }
+
+  .sp-tab {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    flex: 1;
+    text-align: center;
+  }
+
+  .pagination {
+    gap: 10px;
+    padding: 12px 0 4px;
+  }
+
+  .pagination button {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+
+  .pagination span {
+    font-size: 0.78rem;
+  }
+
+  .placement-filters {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .placement-filters .filter-search {
+    min-width: 100%;
+    font-size: 0.82rem;
+  }
+
+  .placement-filters select {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sp-tab {
+    padding: 7px 10px;
+    font-size: 0.75rem;
+  }
+
+  .placement-filters select {
+    min-width: 100%;
+  }
+}

@@ -1,0 +1,20 @@
+const pool = require('../src/config/db');
+(async () => {
+  const r1 = await pool.query('SELECT * FROM yearly_intake ORDER BY passout_year, college, branch LIMIT 20');
+  console.table(r1.rows);
+  const r2 = await pool.query('SELECT SUM(total_students) as total FROM yearly_intake');
+  console.log('Total intake:', r2.rows[0].total);
+  const r3 = await pool.query("SELECT COUNT(DISTINCT roll_no) as placed FROM placements WHERE source != 'KHUB'");
+  console.log('Placed (excl KHUB-only):', r3.rows[0].placed);
+  const r4 = await pool.query("SELECT COUNT(DISTINCT roll_no) as khub FROM placements WHERE source = 'KHUB'");
+  console.log('KHUB students:', r4.rows[0].khub);
+  const r5 = await pool.query('SELECT COUNT(DISTINCT roll_no) as total_fmml FROM fmml_participation');
+  console.log('FMML total:', r5.rows[0].total_fmml);
+  const r6 = await pool.query('SELECT COUNT(DISTINCT f.roll_no) as fmml_placed FROM fmml_participation f JOIN placements p ON p.roll_no = f.roll_no');
+  console.log('FMML & placed:', r6.rows[0].fmml_placed);
+  const r7 = await pool.query("SELECT COUNT(DISTINCT f.roll_no) as fmml_placed_khub FROM fmml_participation f JOIN placements p ON p.roll_no = f.roll_no WHERE p.source = 'KHUB'");
+  console.log('FMML & KHUB placed:', r7.rows[0].fmml_placed_khub);
+  const r8 = await pool.query('SELECT COUNT(DISTINCT roll_no) as total_placed FROM placements');
+  console.log('Total placed (all):', r8.rows[0].total_placed);
+  await pool.end();
+})();

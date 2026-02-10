@@ -1,0 +1,127 @@
+.back-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.profile-grid div {
+  font-size: 0.9rem;
+}
+
+.profile-grid label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.program-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.program-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.program-info label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.no-data {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 8px 0;
+}
+
+/* ── Tablet ── */
+@media (max-width: 900px) {
+  .profile-grid { grid-template-columns: repeat(2, 1fr); }
+  .program-cards { grid-template-columns: 1fr; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .back-btn {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    margin-bottom: 8px;
+  }
+  
+  .profile-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .profile-grid div {
+    font-size: 0.8rem;
+  }
+  
+  .profile-grid label {
+    font-size: 0.68rem;
+    margin-bottom: 2px;
+  }
+  
+  .program-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  
+  .program-info {
+    gap: 8px;
+  }
+  
+  .program-info label {
+    font-size: 0.68rem;
+  }
+  
+  .no-data {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .profile-grid div {
+    font-size: 0.75rem;
+  }
+  
+  .program-info {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

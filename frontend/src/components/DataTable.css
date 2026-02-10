@@ -1,0 +1,115 @@
+.data-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.data-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.data-table tbody tr.clickable {
+  cursor: pointer;
+}
+
+.data-table tbody tr.clickable:hover {
+  background-color: #eff6ff;
+}
+
+.data-table-empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge--placed   { background: #dcfce7; color: #166534; }
+.badge--unplaced  { background: #fee2e2; color: #991b1b; }
+.badge--IT        { background: #dbeafe; color: #1e40af; }
+.badge--Non-IT    { background: #fef3c7; color: #92400e; }
+.badge--fmml      { background: #ede9fe; color: #5b21b6; }
+.badge--khub      { background: #ccfbf1; color: #115e59; }
+.badge--Completed { background: #dcfce7; color: #166534; }
+.badge--Enrolled  { background: #dbeafe; color: #1e40af; }
+.badge--Dropped   { background: #fee2e2; color: #991b1b; }
+.badge--Active    { background: #dcfce7; color: #166534; }
+.badge--Inactive  { background: #f3f4f6; color: #6b7280; }
+
+/* ── Mobile: compact tables ── */
+@media (max-width: 768px) {
+  .data-table {
+    font-size: 0.75rem;
+  }
+  
+  .data-table th {
+    padding: 7px 8px;
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+  }
+  
+  .data-table td {
+    padding: 7px 8px;
+  }
+  
+  .data-table-empty {
+    padding: 24px 12px;
+    font-size: 0.82rem;
+  }
+  
+  .badge {
+    padding: 1px 6px;
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table {
+    font-size: 0.7rem;
+  }
+  
+  .data-table th {
+    padding: 6px 6px;
+    font-size: 0.6rem;
+  }
+  
+  .data-table td {
+    padding: 6px 6px;
+  }
+  
+  .badge {
+    padding: 1px 5px;
+    font-size: 0.6rem;
+    border-radius: 8px;
+  }
+}
