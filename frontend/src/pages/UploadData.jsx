@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
-import LoadingDots from '../components/LoadingDots';
 import './Admin.css';
 
 function UploadData() {
@@ -201,7 +200,7 @@ function UploadData() {
             <h3>Upload History — Batch {passoutYear}</h3>
           </div>
           {loadingHistory ? (
-            <LoadingDots />
+            null
           ) : history.length === 0 ? (
             <div className="empty-state"><p>No uploads yet for this batch.</p></div>
           ) : (

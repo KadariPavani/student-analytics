@@ -16,7 +16,7 @@ import './App.css';
 function AppLayout() {
   const { user, loading } = useAuth();
 
-  if (loading) return <LoadingDots />;
+  if (loading) return <LoadingDots full />;
 
   // If not logged in, only show login
   if (!user) {

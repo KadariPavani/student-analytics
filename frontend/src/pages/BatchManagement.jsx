@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../api';
-import LoadingDots from '../components/LoadingDots';
 import './Admin.css';
 
 function BatchManagement() {
@@ -74,8 +73,6 @@ function BatchManagement() {
       setMessage({ type: 'error', text: err.response?.data?.error || 'Delete failed' });
     }
   };
-
-  if (loading) return <LoadingDots />;
 
   return (
     <div>
@@ -154,44 +151,38 @@ function BatchManagement() {
           </div>
         </div>
       ) : (
-        <div className="batches-list">
-          {batches.map(batch => (
-            <div key={batch.passout_year} className="card batch-card">
-              <div className="batch-header">
-                <div>
-                  <h3>Batch {batch.passout_year}</h3>
-                  <div className="batch-stats">
-                    <span>Total Intake: <strong>{batch.total_intake}</strong></span>
-                    <span>Registered: <strong>{batch.registered_students}</strong></span>
-                    <span>Placed: <strong>{batch.placed_students}</strong></span>
-                    <span>FMML: <strong>{batch.fmml_count}</strong></span>
-                    <span>KHUB: <strong>{batch.khub_count}</strong></span>
-                  </div>
-                </div>
-                <button className="btn btn-danger btn-sm" onClick={() => handleDeleteYear(batch.passout_year)}>
-                  Delete Batch
-                </button>
-              </div>
-              <table className="mini-table">
-                <thead>
-                  <tr>
-                    <th>College</th>
-                    <th>Branch</th>
-                    <th>Intake</th>
+        <div className="card">
+          <div className="card-header"><h3>Passout Year Batches</h3></div>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="mini-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Total Intake</th>
+                  <th>Registered</th>
+                  <th>Placed</th>
+                  <th>FMML</th>
+                  <th>KHUB</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {batches.map(batch => (
+                  <tr key={batch.passout_year}>
+                    <td style={{ fontWeight: 600 }}>{batch.passout_year}</td>
+                    <td>{batch.total_intake?.toLocaleString() || 0}</td>
+                    <td>{batch.registered_students?.toLocaleString() || 0}</td>
+                    <td>{batch.placed_students?.toLocaleString() || 0}</td>
+                    <td>{batch.fmml_count?.toLocaleString() || 0}</td>
+                    <td>{batch.khub_count?.toLocaleString() || 0}</td>
+                    <td>
+                      <button className="btn btn-danger btn-sm" onClick={() => handleDeleteYear(batch.passout_year)}>Delete</button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {batch.intake_data.map((item, idx) => (
-                    <tr key={idx}>
-                      <td>{item.college}</td>
-                      <td>{item.branch}</td>
-                      <td>{item.total_students}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

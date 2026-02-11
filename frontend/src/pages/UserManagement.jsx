@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../api';
-import LoadingDots from '../components/LoadingDots';
 import './Admin.css';
 
 function UserManagement() {
@@ -52,7 +51,6 @@ function UserManagement() {
     }
   };
 
-  if (loading) return <LoadingDots />;
 
   return (
     <div>
@@ -116,39 +114,41 @@ function UserManagement() {
       )}
 
       <div className="card">
-        <table className="mini-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Full Name</th>
-              <th>Role</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(u => (
-              <tr key={u.id}>
-                <td><strong>{u.username}</strong></td>
-                <td>{u.full_name}</td>
-                <td>
-                  <span className={`badge badge--${u.role === 'admin' ? 'placements' : 'khub'}`}>
-                    {u.role.toUpperCase()}
-                  </span>
-                </td>
-                <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                <td>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleDelete(u.id, u.username)}
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div className="mini-table-wrapper">
+          <table className="mini-table mini-table--stackable">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Role</th>
+                <th>Created</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map(u => (
+                <tr key={u.id}>
+                  <td data-label="Username"><strong>{u.username}</strong></td>
+                  <td data-label="Full Name">{u.full_name}</td>
+                  <td data-label="Role">
+                    <span className={`badge badge--${u.role === 'admin' ? 'placements' : 'khub'}`}>
+                      {u.role.toUpperCase()}
+                    </span>
+                  </td>
+                  <td data-label="Created">{new Date(u.created_at).toLocaleDateString()}</td>
+                  <td data-label="Actions" className="actions">
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(u.id, u.username)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

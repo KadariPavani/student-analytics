@@ -3,7 +3,6 @@ import api from '../api';
 import StatsCard from '../components/StatsCard';
 import { MultiBarChartCard, PieChartCard, LineChartCard } from '../components/Charts';
 import DataTable from '../components/DataTable';
-import LoadingDots from '../components/LoadingDots';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -47,8 +46,6 @@ function Dashboard() {
       .catch(err => console.error('Dashboard error:', err))
       .finally(() => setLoading(false));
   }, [selectedYear]);
-
-  if (loading) return <LoadingDots />;
 
   // ── Derived chart data ──
   const rateChartData = placementRate.map(r => ({

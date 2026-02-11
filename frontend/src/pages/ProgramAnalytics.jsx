@@ -3,7 +3,6 @@ import api from '../api';
 import StatsCard from '../components/StatsCard';
 import { MultiBarChartCard } from '../components/Charts';
 import DataTable from '../components/DataTable';
-import LoadingDots from '../components/LoadingDots';
 import './ProgramAnalytics.css';
 
 function ProgramAnalytics() {
@@ -37,8 +36,6 @@ function ProgramAnalytics() {
       .catch(err => console.error('Error:', err))
       .finally(() => setLoading(false));
   }, [selectedYear]);
-
-  if (loading) return <LoadingDots />;
 
   const o = overview || {};
   const totalStudents = Number(o.total_students || 0);
@@ -133,7 +130,7 @@ function ProgramAnalytics() {
             </thead>
             <tbody>
               <tr>
-                <td><span className="source-label source-label--campus">Campus Placed students</span> <span className="source-desc">On-Campus</span></td>
+                <td><span className="source-label source-label--campus">Campus</span> <span className="source-desc">On-Campus placed students</span></td>
                 <td className="num-cell"><strong>{campusPlaced.toLocaleString()}</strong></td>
                 <td className="num-cell">{campusPct}%</td>
               </tr>

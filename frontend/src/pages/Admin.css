@@ -514,3 +514,49 @@
     padding: 6px 8px;
   }
 }
+
+/* Responsive wrapper for horizontal scrolling on narrow viewports */
+.mini-table-wrapper {
+  overflow-x: auto;
+}
+
+/* Small screens: stack table rows into card-like blocks */
+@media (max-width: 600px) {
+  /* Opt-in stacking: use .mini-table--stackable on tables that should convert to cards */
+  .mini-table--stackable thead {
+    display: none;
+  }
+
+  .mini-table--stackable tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    background: var(--surface);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .mini-table--stackable tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 6px;
+    border-bottom: none;
+  }
+
+  .mini-table--stackable tbody tr td::before {
+    content: attr(data-label);
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-right: 8px;
+  }
+
+  .mini-table--stackable tbody tr td.actions {
+    display: block;
+    padding-top: 8px;
+  }
+
+  .mini-table--stackable tbody tr td.actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

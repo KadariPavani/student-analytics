@@ -1,9 +1,8 @@
-import LoadingDots from './LoadingDots';
 import './DataTable.css';
 
 function DataTable({ columns, data, onRowClick, loading }) {
   if (loading) {
-    return <LoadingDots />;
+    return null;
   }
 
   if (!data || data.length === 0) {
