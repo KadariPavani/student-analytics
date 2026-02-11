@@ -3,6 +3,8 @@ const router = express.Router();
 const pool = require('../config/db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 
+const isServerless = !!process.env.VERCEL;
+
 // GET /api/batches — list all batches (grouped by year)
 router.get('/', authenticate, async (req, res) => {
   try {
@@ -52,14 +54,14 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
       return res.status(400).json({ error: 'passout_year and entries[] are required' });
     }
 
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const added = [];
+    const added = [];
+    
+    if (isServerless) {
+      // Serverless: run queries directly (no transactions)
       for (const entry of entries) {
         const { college, branch, total_students } = entry;
         if (!college || !branch || !total_students) continue;
-        const r = await client.query(
+        const r = await pool.query(
           `INSERT INTO yearly_intake (passout_year, college, branch, total_students)
            VALUES ($1, $2, $3, $4)
            ON CONFLICT (passout_year, college, branch) DO UPDATE SET total_students = $4
@@ -68,14 +70,33 @@ router.post('/', authenticate, requireAdmin, async (req, res) => {
         );
         added.push(r.rows[0]);
       }
-      await client.query('COMMIT');
-      res.status(201).json({ message: `${added.length} intake entries saved`, data: added });
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
+    } else {
+      // Local: use transactions
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        for (const entry of entries) {
+          const { college, branch, total_students } = entry;
+          if (!college || !branch || !total_students) continue;
+          const r = await client.query(
+            `INSERT INTO yearly_intake (passout_year, college, branch, total_students)
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (passout_year, college, branch) DO UPDATE SET total_students = $4
+             RETURNING *`,
+            [passout_year, college, branch, parseInt(total_students)]
+          );
+          added.push(r.rows[0]);
+        }
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
     }
+    
+    res.status(201).json({ message: `${added.length} intake entries saved`, data: added });
   } catch (err) {
     console.error('Create batch error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
@@ -118,27 +139,43 @@ router.delete('/:id', authenticate, requireAdmin, async (req, res) => {
 
 // DELETE /api/batches/year/:year — admin deletes all data for a passout year
 router.delete('/year/:year', authenticate, requireAdmin, async (req, res) => {
-  const client = await pool.connect();
   try {
     const year = parseInt(req.params.year);
-    await client.query('BEGIN');
-    // Delete in dependency order
-    await client.query('DELETE FROM khub_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
-    await client.query('DELETE FROM fmml_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
-    await client.query('DELETE FROM placements WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
-    await client.query('DELETE FROM students WHERE passout_year = $1', [year]);
-    await client.query('DELETE FROM yearly_intake WHERE passout_year = $1', [year]);
-    await client.query('DELETE FROM upload_history WHERE passout_year = $1', [year]);
-    await client.query('COMMIT');
+    
+    if (isServerless) {
+      // Serverless: run queries directly (no transactions)
+      await pool.query('DELETE FROM khub_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+      await pool.query('DELETE FROM fmml_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+      await pool.query('DELETE FROM placements WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+      await pool.query('DELETE FROM students WHERE passout_year = $1', [year]);
+      await pool.query('DELETE FROM yearly_intake WHERE passout_year = $1', [year]);
+      await pool.query('DELETE FROM upload_history WHERE passout_year = $1', [year]);
+    } else {
+      // Local: use transactions
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query('DELETE FROM khub_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+        await client.query('DELETE FROM fmml_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+        await client.query('DELETE FROM placements WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+        await client.query('DELETE FROM students WHERE passout_year = $1', [year]);
+        await client.query('DELETE FROM yearly_intake WHERE passout_year = $1', [year]);
+        await client.query('DELETE FROM upload_history WHERE passout_year = $1', [year]);
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
+    }
+    
     // Refresh views
     try { await pool.query('SELECT refresh_analytics()'); } catch (e) { /* ignore if no data */ }
     res.json({ message: `All data for batch ${year} deleted` });
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error('Delete year error:', err);
     res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    client.release();
   }
 });
 

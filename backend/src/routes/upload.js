@@ -7,6 +7,9 @@ const fs = require('fs');
 const pool = require('../config/db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 
+// Flag for serverless mode (Neon HTTP driver doesn't support transactions)
+const isServerless = !!process.env.VERCEL;
+
 // Configure multer for file uploads
 // On Vercel (read-only FS) use /tmp; locally use project uploads/ folder
 const uploadDir = process.env.VERCEL
@@ -228,7 +231,10 @@ async function processPlacementRows(client, rows, passout_year) {
       }
 
       // Use SAVEPOINT so a single row failure doesn't abort the whole transaction
-      await client.query(`SAVEPOINT placement_row_${i}`);
+      // Skip in serverless mode (Neon HTTP doesn't support transactions)
+      if (!isServerless) {
+        await client.query(`SAVEPOINT placement_row_${i}`);
+      }
       const { college: derivedCollege, branch: derivedBranch } = parseRollNumber(rollNo);
 
       await client.query(`
@@ -278,10 +284,14 @@ async function processPlacementRows(client, rows, passout_year) {
         offerDate && !isNaN(offerDate.getTime()) ? offerDate : null,
       ]);
 
-      await client.query(`RELEASE SAVEPOINT placement_row_${i}`);
+      if (!isServerless) {
+        await client.query(`RELEASE SAVEPOINT placement_row_${i}`);
+      }
       added++;
     } catch (rowErr) {
-      await client.query(`ROLLBACK TO SAVEPOINT placement_row_${i}`).catch(() => {});
+      if (!isServerless) {
+        await client.query(`ROLLBACK TO SAVEPOINT placement_row_${i}`).catch(() => {});
+      }
       skipped++;
       errors.push(`Placements Row ${i + 2}: ${rowErr.message}`);
     }
@@ -300,7 +310,9 @@ async function processFmmlRows(client, rows, passout_year) {
       if (!rollNo) { skipped++; continue; }
 
       // Use SAVEPOINT so a single row failure doesn't abort the whole transaction
-      await client.query(`SAVEPOINT fmml_row_${i}`);
+      if (!isServerless) {
+        await client.query(`SAVEPOINT fmml_row_${i}`);
+      }
       const { college: derivedCollege, branch: derivedBranch } = parseRollNumber(rollNo);
 
       await client.query(`
@@ -340,10 +352,14 @@ async function processFmmlRows(client, rows, passout_year) {
         compDate && !isNaN(compDate.getTime()) ? compDate : null,
       ]);
 
-      await client.query(`RELEASE SAVEPOINT fmml_row_${i}`);
+      if (!isServerless) {
+        await client.query(`RELEASE SAVEPOINT fmml_row_${i}`);
+      }
       added++;
     } catch (rowErr) {
-      await client.query(`ROLLBACK TO SAVEPOINT fmml_row_${i}`).catch(() => {});
+      if (!isServerless) {
+        await client.query(`ROLLBACK TO SAVEPOINT fmml_row_${i}`).catch(() => {});
+      }
       skipped++;
       errors.push(`FMML Row ${i + 2}: ${rowErr.message}`);
     }
@@ -368,7 +384,9 @@ async function processKhubRows(client, rows, passout_year) {
       const { college: derivedCollege, branch: derivedBranch } = parseRollNumber(rollNo);
 
       // Use SAVEPOINT so a single row failure doesn't abort the whole transaction
-      await client.query(`SAVEPOINT khub_row_${i}`);
+      if (!isServerless) {
+        await client.query(`SAVEPOINT khub_row_${i}`);
+      }
 
       // Upsert student
       await client.query(`
@@ -400,7 +418,9 @@ async function processKhubRows(client, rows, passout_year) {
       const companyName = row.company_name ? String(row.company_name).trim() : '';
       if (isPlaceholderCompany(companyName)) {
         // Still count as KHUB member (inserted above), just skip the placement record
-        await client.query(`RELEASE SAVEPOINT khub_row_${i}`);
+        if (!isServerless) {
+          await client.query(`RELEASE SAVEPOINT khub_row_${i}`);
+        }
         added++;
         continue;
       }
@@ -424,10 +444,14 @@ async function processKhubRows(client, rows, passout_year) {
         offerDate && !isNaN(offerDate.getTime()) ? offerDate : null,
       ]);
 
-      await client.query(`RELEASE SAVEPOINT khub_row_${i}`);
+      if (!isServerless) {
+        await client.query(`RELEASE SAVEPOINT khub_row_${i}`);
+      }
       added++;
     } catch (rowErr) {
-      await client.query(`ROLLBACK TO SAVEPOINT khub_row_${i}`).catch(() => {});
+      if (!isServerless) {
+        await client.query(`ROLLBACK TO SAVEPOINT khub_row_${i}`).catch(() => {});
+      }
       skipped++;
       errors.push(`KHUB Row ${i + 2}: ${rowErr.message}`);
     }
@@ -440,7 +464,10 @@ async function processKhubRows(client, rows, passout_year) {
 //   Sheet 1: Placements   Sheet 2: FMML   Sheet 3: KHUB
 // ══════════════════════════════════════════════════════════════
 router.post('/combined', authenticate, requireAdmin, upload.single('file'), async (req, res) => {
-  const client = await pool.connect();
+  // In serverless mode, use pool directly; otherwise use client for transactions
+  const client = isServerless ? null : await pool.connect();
+  const db = isServerless ? pool : client;
+  
   try {
     const { passout_year } = req.body;
     if (!passout_year) return res.status(400).json({ error: 'passout_year is required' });
@@ -471,7 +498,7 @@ router.post('/combined', authenticate, requireAdmin, upload.single('file'), asyn
       const missing = required.filter(col => !(col in placementRows[0]));
       if (missing.length > 0) {
         console.error('Placements validation failed. Missing:', missing, 'Present:', Object.keys(placementRows[0]));
-        client.release();
+        if (client) client.release();
         return res.status(400).json({
           error: `Placements sheet: Missing required columns: ${missing.join(', ')}`,
           present_keys: Object.keys(placementRows[0]),
@@ -487,7 +514,7 @@ router.post('/combined', authenticate, requireAdmin, upload.single('file'), asyn
       const missing = required.filter(col => !(col in fmmlRows[0]));
       if (missing.length > 0) {
         console.error('FMML validation failed. Missing:', missing, 'Present:', Object.keys(fmmlRows[0]));
-        client.release();
+        if (client) client.release();
         return res.status(400).json({
           error: `FMML sheet: Missing required columns: ${missing.join(', ')}`,
           present_keys: Object.keys(fmmlRows[0]),
@@ -504,7 +531,7 @@ router.post('/combined', authenticate, requireAdmin, upload.single('file'), asyn
       const missing = required.filter(col => !(col in khubRows[0]));
       if (missing.length > 0) {
         console.error('KHUB validation failed. Missing:', missing, 'Present:', Object.keys(khubRows[0]));
-        client.release();
+        if (client) client.release();
         return res.status(400).json({
           error: `KHUB sheet: Missing required columns: ${missing.join(', ')}`,
           present_keys: Object.keys(khubRows[0]),
@@ -514,18 +541,21 @@ router.post('/combined', authenticate, requireAdmin, upload.single('file'), asyn
       }
     }
 
-    await client.query('BEGIN');
+    // Skip transaction in serverless mode (Neon HTTP doesn't support it)
+    if (!isServerless) {
+      await client.query('BEGIN');
+    }
 
     const pResult = placementRows.length > 0
-      ? await processPlacementRows(client, placementRows, passout_year)
+      ? await processPlacementRows(db, placementRows, passout_year)
       : { added: 0, skipped: 0, errors: [] };
 
     const fResult = fmmlRows.length > 0
-      ? await processFmmlRows(client, fmmlRows, passout_year)
+      ? await processFmmlRows(db, fmmlRows, passout_year)
       : { added: 0, skipped: 0, errors: [] };
 
     const kResult = khubRows.length > 0
-      ? await processKhubRows(client, khubRows, passout_year)
+      ? await processKhubRows(db, khubRows, passout_year)
       : { added: 0, skipped: 0, errors: [] };
 
     const allErrors = [...pResult.errors, ...fResult.errors, ...kResult.errors];
@@ -534,28 +564,30 @@ router.post('/combined', authenticate, requireAdmin, upload.single('file'), asyn
 
     // Log upload history for each type that had data
     if (placementRows.length > 0) {
-      await client.query(
+      await db.query(
         `INSERT INTO upload_history (passout_year, upload_type, file_name, records_added, records_skipped, errors, uploaded_by)
          VALUES ($1, 'placements', $2, $3, $4, $5, $6)`,
         [passout_year, req.file.originalname, pResult.added, pResult.skipped, pResult.errors.length > 0 ? pResult.errors.join('\n') : null, req.user.id]
       );
     }
     if (fmmlRows.length > 0) {
-      await client.query(
+      await db.query(
         `INSERT INTO upload_history (passout_year, upload_type, file_name, records_added, records_skipped, errors, uploaded_by)
          VALUES ($1, 'fmml', $2, $3, $4, $5, $6)`,
         [passout_year, req.file.originalname, fResult.added, fResult.skipped, fResult.errors.length > 0 ? fResult.errors.join('\n') : null, req.user.id]
       );
     }
     if (khubRows.length > 0) {
-      await client.query(
+      await db.query(
         `INSERT INTO upload_history (passout_year, upload_type, file_name, records_added, records_skipped, errors, uploaded_by)
          VALUES ($1, 'khub', $2, $3, $4, $5, $6)`,
         [passout_year, req.file.originalname, kResult.added, kResult.skipped, kResult.errors.length > 0 ? kResult.errors.join('\n') : null, req.user.id]
       );
     }
 
-    await client.query('COMMIT');
+    if (!isServerless) {
+      await client.query('COMMIT');
+    }
 
     // Refresh materialized views
     try { await pool.query('SELECT refresh_analytics()'); } catch (e) { /* ok if empty */ }
@@ -572,11 +604,13 @@ router.post('/combined', authenticate, requireAdmin, upload.single('file'), asyn
       errors: allErrors.slice(0, 30),
     });
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) {
+      try { await client.query('ROLLBACK'); } catch (e) { /* ignore */ }
+    }
     console.error('Upload combined error:', err);
     res.status(500).json({ error: err.message || 'Upload failed' });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 });
 
@@ -680,7 +714,10 @@ router.get('/template', (req, res) => {
 // DELETE /api/upload/data — Admin clears data by type & year
 // ══════════════════════════════════════════════════════════════
 router.delete('/data', authenticate, requireAdmin, async (req, res) => {
-  const client = await pool.connect();
+  // In serverless mode, use pool directly; otherwise use client for transactions
+  const client = isServerless ? null : await pool.connect();
+  const db = isServerless ? pool : client;
+  
   try {
     const { passout_year, type } = req.query;
     if (!passout_year || !type) {
@@ -688,53 +725,59 @@ router.delete('/data', authenticate, requireAdmin, async (req, res) => {
     }
     const year = parseInt(passout_year);
 
-    await client.query('BEGIN');
+    if (!isServerless) {
+      await client.query('BEGIN');
+    }
     let deleted = 0;
 
     if (type === 'placements') {
-      const r = await client.query(
+      const r = await db.query(
         `DELETE FROM placements WHERE source != 'KHUB' AND roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)`,
         [year]
       );
       deleted = r.rowCount;
     } else if (type === 'fmml') {
-      const r = await client.query(
+      const r = await db.query(
         'DELETE FROM fmml_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)',
         [year]
       );
       deleted = r.rowCount;
     } else if (type === 'khub') {
-      const r1 = await client.query(
+      const r1 = await db.query(
         `DELETE FROM placements WHERE source = 'KHUB' AND roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)`,
         [year]
       );
-      const r2 = await client.query(
+      const r2 = await db.query(
         'DELETE FROM khub_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)',
         [year]
       );
       deleted = r1.rowCount + r2.rowCount;
     } else if (type === 'all') {
       // Delete in dependency order: child tables first, then students
-      const r1 = await client.query('DELETE FROM placements WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
-      const r2 = await client.query('DELETE FROM fmml_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
-      const r3 = await client.query('DELETE FROM khub_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
-      const r4 = await client.query('DELETE FROM students WHERE passout_year = $1', [year]);
-      await client.query('DELETE FROM upload_history WHERE passout_year = $1', [year]);
+      const r1 = await db.query('DELETE FROM placements WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+      const r2 = await db.query('DELETE FROM fmml_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+      const r3 = await db.query('DELETE FROM khub_participation WHERE roll_no IN (SELECT roll_no FROM students WHERE passout_year = $1)', [year]);
+      const r4 = await db.query('DELETE FROM students WHERE passout_year = $1', [year]);
+      await db.query('DELETE FROM upload_history WHERE passout_year = $1', [year]);
       deleted = r1.rowCount + r2.rowCount + r3.rowCount + r4.rowCount;
     } else {
       return res.status(400).json({ error: 'type must be placements, fmml, khub, or all' });
     }
 
-    await client.query('COMMIT');
+    if (!isServerless) {
+      await client.query('COMMIT');
+    }
     try { await pool.query('SELECT refresh_analytics()'); } catch (e) { /* ok */ }
 
     res.json({ message: `Deleted ${deleted} ${type} records for batch ${year}` });
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) {
+      try { await client.query('ROLLBACK'); } catch (e) { /* ignore */ }
+    }
     console.error('Delete data error:', err);
     res.status(500).json({ error: 'Internal server error' });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 });
 
