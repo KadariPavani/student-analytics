@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "name": "student-analytics",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "serverless-http": "^3.2.0"
+  }
+}
