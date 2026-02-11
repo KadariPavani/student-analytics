@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../api';
+import LoadingDots from '../components/LoadingDots';
 import './Admin.css';
 
 function UserManagement() {
@@ -51,7 +52,7 @@ function UserManagement() {
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <LoadingDots />;
 
   return (
     <div>

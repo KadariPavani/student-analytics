@@ -63,9 +63,6 @@ function StudentsTab() {
 
   return (
     <>
-      <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)' }}>
-        Browse {pagination.total.toLocaleString()} students across KIET / KIEW / KIEK
-      </p>
       <div className="card">
         <Filters onFilterChange={setFilters} showPlacedFilter />
         <DataTable
@@ -174,7 +171,7 @@ function PlacementsTab() {
           data={companyChartData}
           dataKey="Offers"
           xKey="name"
-          fill="#4f46e5"
+          fill="#6366f1"
         />
       </div>
 
@@ -274,11 +271,15 @@ function StudentPlacements() {
   return (
     <div>
       <div className="page-header">
-        <h1>Student Placements</h1>
-        <div style={{ marginLeft: 'auto' }}>
-          <button onClick={downloadPlacedExcel} disabled={downloading} className="btn btn--secondary">
-            {downloading ? 'Preparing...' : 'Download placed students (Excel)'}
-          </button>
+        <div className="page-header-top">
+          <div>
+            <h1>Student Placements</h1>
+          </div>
+          <div>
+            <button onClick={downloadPlacedExcel} disabled={downloading} className="btn btn--secondary">
+              {downloading ? 'Preparing...' : 'Download placed students (Excel)'}
+            </button>
+          </div>
         </div>
       </div>
 

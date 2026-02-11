@@ -1,17 +1,23 @@
 .back-btn {
-  padding: 6px 14px;
-  border: 1px solid var(--border);
+  padding: 7px 16px;
+  border: 1.5px solid var(--border);
   border-radius: 6px;
-  background: white;
+  background: var(--surface);
   font-size: 0.85rem;
+  font-weight: 500;
   color: var(--text-secondary);
   margin-bottom: 12px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .back-btn:hover {
   background: var(--bg);
   color: var(--text);
+  border-color: var(--primary-light);
+}
+
+.student-profile {
+  margin-bottom: 0;
 }
 
 .profile-grid {
@@ -27,9 +33,9 @@
 .profile-grid label {
   display: block;
   color: var(--text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   font-weight: 600;
   margin-bottom: 4px;
 }
@@ -49,10 +55,10 @@
 
 .program-info label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   font-weight: 600;
   margin-bottom: 2px;
 }
@@ -65,63 +71,63 @@
 
 /* ── Tablet ── */
 @media (max-width: 900px) {
-  .profile-grid { grid-template-columns: repeat(2, 1fr); }
+  .profile-grid { grid-template-columns: repeat(3, 1fr); }
   .program-cards { grid-template-columns: 1fr; }
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .back-btn {
-    padding: 5px 10px;
-    font-size: 0.78rem;
-    margin-bottom: 8px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
   }
-  
+
   .profile-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 12px;
   }
-  
+
   .profile-grid div {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
   }
-  
+
   .profile-grid label {
     font-size: 0.68rem;
     margin-bottom: 2px;
   }
-  
+
   .program-cards {
     grid-template-columns: 1fr;
     gap: 12px;
     margin-top: 12px;
   }
-  
+
   .program-info {
-    gap: 8px;
+    gap: 10px;
   }
-  
+
   .program-info label {
     font-size: 0.68rem;
   }
-  
+
   .no-data {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
   }
 }
 
 @media (max-width: 480px) {
   .profile-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 10px;
   }
-  
+
   .profile-grid div {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
   }
-  
+
   .program-info {
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 8px;
   }
 }

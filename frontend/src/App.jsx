@@ -10,12 +10,13 @@ import ProgramAnalytics from './pages/ProgramAnalytics';
 import BatchManagement from './pages/BatchManagement';
 import UploadData from './pages/UploadData';
 import UserManagement from './pages/UserManagement';
+import LoadingDots from './components/LoadingDots';
 import './App.css';
 
 function AppLayout() {
   const { user, loading } = useAuth();
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <LoadingDots />;
 
   // If not logged in, only show login
   if (!user) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import DataTable from '../components/DataTable';
+import LoadingDots from '../components/LoadingDots';
 import './StudentDetail.css';
 
 function StudentDetail() {
@@ -17,7 +18,7 @@ function StudentDetail() {
       .finally(() => setLoading(false));
   }, [rollNo]);
 
-  if (loading) return <div className="loading">Loading student details...</div>;
+  if (loading) return <LoadingDots />;
   if (!data) return <div className="error">Student not found</div>;
 
   const { student, placements, fmml, khub } = data;

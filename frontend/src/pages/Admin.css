@@ -6,13 +6,13 @@
 
 /* Buttons */
 .btn {
-  padding: 8px 18px;
+  padding: 9px 20px;
   border: none;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -24,6 +24,7 @@
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-dark);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 .btn-primary:disabled {
   opacity: 0.6;
@@ -44,6 +45,7 @@
 }
 .btn-danger:hover {
   background: #dc2626;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
 .btn-sm {
@@ -93,16 +95,18 @@
 }
 .form-group input,
 .form-group select {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
   border-radius: 6px;
   font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background: var(--surface);
 }
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
 }
 .form-hint {
   font-size: 0.75rem;
@@ -132,10 +136,17 @@
 }
 .intake-row select,
 .intake-row input {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
   border-radius: 6px;
   font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+.intake-row select:focus,
+.intake-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
 }
 .intake-row select {
   width: 140px;
@@ -152,6 +163,10 @@
 }
 .batch-card {
   padding: 20px;
+  transition: box-shadow 0.2s ease;
+}
+.batch-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 .batch-header {
   display: flex;
@@ -182,11 +197,11 @@
 .mini-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 .mini-table th,
 .mini-table td {
-  padding: 8px 12px;
+  padding: 7px 10px;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
@@ -196,6 +211,10 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  background: var(--bg);
+}
+.mini-table tbody tr {
+  transition: background-color 0.15s ease;
 }
 .mini-table tbody tr:hover {
   background: #f8fafc;
@@ -226,7 +245,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 .tab-btn.active {
   border-color: var(--primary);
@@ -324,32 +343,9 @@
 }
 
 /* Badges */
-.badge {
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
 .badge--placements {
   background: #dbeafe;
   color: #1e40af;
-}
-.badge--fmml {
-  background: #fef3c7;
-  color: #92400e;
-}
-.badge--khub {
-  background: #d1fae5;
-  color: #065f46;
-}
-.badge--IT {
-  background: #dbeafe;
-  color: #1e40af;
-}
-.badge--Non-IT {
-  background: #fef3c7;
-  color: #92400e;
 }
 
 /* User management */
@@ -370,11 +366,12 @@
 /* Outline button */
 .btn-outline {
   background: transparent;
-  color: var(--text-secondary, #555);
-  border: 1px solid var(--border, #ddd);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
 }
 .btn-outline:hover {
-  background: var(--bg-secondary, #f5f5f5);
+  background: var(--bg);
+  border-color: var(--primary-light);
 }
 
 /* Field notes list in reference panel */
@@ -382,14 +379,14 @@
   margin: 6px 0 0 18px;
   padding: 0;
   font-size: 0.82rem;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary);
 }
 .field-notes-list li {
   margin-bottom: 3px;
 }
 .field-note {
   font-size: 0.82rem;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary);
   margin: 0 0 6px 0;
 }
 
@@ -399,92 +396,92 @@
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .btn {
-    padding: 7px 14px;
-    font-size: 0.8rem;
+    padding: 8px 16px;
+    font-size: 0.82rem;
   }
-  
+
   .btn-sm {
-    padding: 4px 10px;
-    font-size: 0.72rem;
+    padding: 5px 10px;
+    font-size: 0.75rem;
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .intake-row {
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .intake-row select,
   .intake-row input {
     width: 100%;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
   }
-  
+
   .batch-header {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .batch-stats {
     gap: 12px;
   }
-  
+
   .batch-stats span {
     font-size: 0.75rem;
   }
-  
+
   .mini-table {
     font-size: 0.78rem;
   }
-  
+
   .mini-table th,
   .mini-table td {
-    padding: 6px 8px;
+    padding: 7px 10px;
   }
-  
+
   .upload-tabs {
     flex-wrap: wrap;
     gap: 6px;
   }
-  
+
   .tab-btn {
     padding: 8px 14px;
     font-size: 0.82rem;
     flex: 1;
     text-align: center;
   }
-  
+
   .field-list {
     gap: 4px;
   }
-  
+
   .field-tag {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     padding: 3px 7px;
   }
-  
+
   .user-form {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .user-form .form-group {
     width: 100%;
   }
-  
+
   .result-stats {
     flex-wrap: wrap;
     gap: 12px;
   }
-  
+
   .alert {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     padding: 10px 12px;
   }
 }
@@ -493,11 +490,11 @@
   .batch-card {
     padding: 14px;
   }
-  
+
   .batch-header h3 {
     font-size: 0.95rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
@@ -506,5 +503,14 @@
     width: 100%;
     text-align: center;
     justify-content: center;
+  }
+
+  .mini-table {
+    font-size: 0.72rem;
+  }
+
+  .mini-table th,
+  .mini-table td {
+    padding: 6px 8px;
   }
 }

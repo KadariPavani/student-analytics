@@ -3,6 +3,7 @@ import api from '../api';
 import StatsCard from '../components/StatsCard';
 import { MultiBarChartCard } from '../components/Charts';
 import DataTable from '../components/DataTable';
+import LoadingDots from '../components/LoadingDots';
 import './ProgramAnalytics.css';
 
 function ProgramAnalytics() {
@@ -37,7 +38,7 @@ function ProgramAnalytics() {
       .finally(() => setLoading(false));
   }, [selectedYear]);
 
-  if (loading) return <div className="loading">Loading statistics...</div>;
+  if (loading) return <LoadingDots />;
 
   const o = overview || {};
   const totalStudents = Number(o.total_students || 0);

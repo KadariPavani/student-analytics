@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
+import LoadingDots from '../components/LoadingDots';
 import './Admin.css';
 
 function UploadData() {
@@ -90,17 +91,12 @@ function UploadData() {
         <p>Upload a single Excel file with 3 sheets: <strong>Placements</strong>, <strong>FMML</strong>, <strong>KHUB</strong></p>
       </div>
 
-      <div className="grid-2">
+      <div>
         {/* Upload Form */}
         <div className="card">
           <div className="card-header">
             <h3>Upload Batch Data</h3>
           </div>
-          <p className="card-description">
-            Upload one <code>.xlsx</code> file containing three sheets.
-            The sheets are matched by name (Placements, FMML, KHUB) or by position (1st, 2nd, 3rd).
-            Empty sheets are skipped.
-          </p>
 
           <form onSubmit={handleUpload} className="upload-form">
             <div className="form-group">
@@ -195,102 +191,7 @@ function UploadData() {
           )}
         </div>
 
-        {/* Sheet Column Reference */}
-        <div className="card">
-          <div className="card-header">
-            <h3>Excel Sheet Reference</h3>
-          </div>
-          <div className="field-reference">
-            <div className="alert alert--info" style={{ marginBottom: 12, fontSize: '0.85rem' }}>
-              <strong>No need for branch or college columns!</strong> They are auto-derived from the roll number.<br/>
-              e.g. <code>22JN1A0501</code> → JN = KIEW, 05 = CSE
-            </div>
 
-            <h4 style={{ marginTop: 0 }}>Roll Number Codes</h4>
-            <table className="mini-table" style={{ fontSize: '0.8rem', marginBottom: 12 }}>
-              <thead><tr><th>College Code</th><th>College</th><th></th><th>Branch Code</th><th>Branch</th></tr></thead>
-              <tbody>
-                <tr><td>B2</td><td>KIET</td><td></td><td>05</td><td>CSE</td></tr>
-                <tr><td>JN</td><td>KIEW</td><td></td><td>04</td><td>ECE</td></tr>
-                <tr><td>6Q</td><td>KIEK</td><td></td><td>03</td><td>MECH</td></tr>
-                <tr><td></td><td></td><td></td><td>02</td><td>EEE</td></tr>
-                <tr><td></td><td></td><td></td><td>01</td><td>CIVIL</td></tr>
-                <tr><td></td><td></td><td></td><td>42</td><td>CSM</td></tr>
-                <tr><td></td><td></td><td></td><td>43</td><td>CAI</td></tr>
-                <tr><td></td><td></td><td></td><td>44</td><td>CSD</td></tr>
-                <tr><td></td><td></td><td></td><td>45</td><td>AID</td></tr>
-                <tr><td></td><td></td><td></td><td>46</td><td>CSC</td></tr>
-              </tbody>
-            </table>
-
-            <hr />
-
-            {/* Sheet 1 */}
-            <h4>Sheet 1 — Placements</h4>
-            <p className="field-note">One row per placement offer. Same student can have multiple rows.</p>
-            <strong>Required:</strong>
-            <div className="field-list">
-              {['roll_no', 'student_name', 'company_name', 'ctc_lpa'].map(f => (
-                <span key={f} className="field-tag field-tag--required">{f}</span>
-              ))}
-            </div>
-            <strong>Optional:</strong>
-            <div className="field-list">
-              {['offer_type', 'role', 'source', 'offer_date', 'gender', 'tenth_pct', 'twelfth_pct', 'grad_cgpa', 'phone', 'email'].map(f => (
-                <span key={f} className="field-tag field-tag--optional">{f}</span>
-              ))}
-            </div>
-            <ul className="field-notes-list">
-              <li><strong>offer_type</strong>: IT or Non-IT (also accepts Core)</li>
-              <li><strong>ctc_lpa</strong>: Package in LPA (e.g. 7.5)</li>
-              <li>Column aliases: NAME, COMPANY, PACKAGE, IT/NON IT also work</li>
-            </ul>
-
-            <hr />
-
-            {/* Sheet 2 */}
-            <h4>Sheet 2 — FMML</h4>
-            <strong>Required:</strong>
-            <div className="field-list">
-              {['roll_no', 'student_name'].map(f => (
-                <span key={f} className="field-tag field-tag--required">{f}</span>
-              ))}
-            </div>
-            <strong>Optional:</strong>
-            <div className="field-list">
-              {['fmml_batch', 'status', 'module_name', 'score', 'certificate_id', 'completion_date'].map(f => (
-                <span key={f} className="field-tag field-tag--optional">{f}</span>
-              ))}
-            </div>
-            <ul className="field-notes-list">
-              <li><strong>status</strong>: Enrolled, Completed, Dropped</li>
-              <li>Column aliases: NAME, ROLL NO also work</li>
-            </ul>
-
-            <hr />
-
-            {/* Sheet 3 */}
-            <h4>Sheet 3 — KHUB Placements</h4>
-            <p className="field-note">Placements sourced through KHUB. These are recorded separately from Sheet 1 placements.</p>
-            <strong>Required:</strong>
-            <div className="field-list">
-              {['roll_no', 'student_name', 'company_name', 'ctc_lpa'].map(f => (
-                <span key={f} className="field-tag field-tag--required">{f}</span>
-              ))}
-            </div>
-            <strong>Optional:</strong>
-            <div className="field-list">
-              {['offer_type', 'role', 'offer_date'].map(f => (
-                <span key={f} className="field-tag field-tag--optional">{f}</span>
-              ))}
-            </div>
-            <ul className="field-notes-list">
-              <li><strong>offer_type</strong>: IT or Non-IT</li>
-              <li>Column aliases: NAME, COMPANY, PACKAGE, IT/NON IT also work</li>
-              <li>Source auto-set to <strong>KHUB</strong></li>
-            </ul>
-          </div>
-        </div>
       </div>
 
       {/* Upload History */}
@@ -300,7 +201,7 @@ function UploadData() {
             <h3>Upload History — Batch {passoutYear}</h3>
           </div>
           {loadingHistory ? (
-            <div className="loading">Loading history...</div>
+            <LoadingDots />
           ) : history.length === 0 ? (
             <div className="empty-state"><p>No uploads yet for this batch.</p></div>
           ) : (

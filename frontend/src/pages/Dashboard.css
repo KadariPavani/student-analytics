@@ -7,18 +7,20 @@
 }
 
 .year-filter select {
-  padding: 8px 14px;
-  border: 1px solid var(--border);
+  padding: 9px 16px;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 500;
   background: var(--surface);
   cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text);
 }
 .year-filter select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
 }
 
 /* Dashboard Tabs */
@@ -37,7 +39,7 @@
 }
 
 .dash-tab {
-  padding: 8px 20px;
+  padding: 8px 22px;
   border: none;
   border-radius: 8px;
   background: transparent;
@@ -45,7 +47,7 @@
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 .dash-tab:hover {
@@ -55,6 +57,7 @@
 .dash-tab.active {
   background: var(--primary);
   color: white;
+  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
 }
 
 .card-subtitle {
@@ -63,6 +66,15 @@
 }
 
 /* College cards */
+.college-card {
+  transition: all 0.2s ease;
+}
+
+.college-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
 .college-card .card-header {
   display: flex;
   justify-content: space-between;
@@ -86,10 +98,11 @@
 }
 
 .college-stat-label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .college-stat-value {
@@ -98,7 +111,14 @@
   color: var(--text);
 }
 
-/* ── Tablet ── */
+/* ── Large Tablet ── */
+@media (max-width: 1200px) {
+  .college-stats {
+    gap: 10px;
+  }
+}
+
+/* ── Small Tablet ── */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr; }
 }
@@ -116,29 +136,33 @@
     border-radius: 8px;
     width: 100%;
   }
-  
+
   .dash-tab {
-    padding: 7px 14px;
-    font-size: 0.78rem;
+    padding: 8px 14px;
+    font-size: 0.8rem;
     flex: 1;
     text-align: center;
   }
-  
+
   .year-filter select {
-    padding: 7px 10px;
-    font-size: 0.82rem;
+    padding: 8px 12px;
+    font-size: 0.85rem;
     width: 100%;
   }
-  
+
+  .college-card:hover {
+    transform: none;
+  }
+
   .college-stats {
     gap: 8px;
-    margin-top: 10px;
+    margin-top: 12px;
   }
-  
+
   .college-stat-label {
     font-size: 0.68rem;
   }
-  
+
   .college-stat-value {
     font-size: 0.95rem;
   }
@@ -146,7 +170,7 @@
 
 @media (max-width: 480px) {
   .dash-tab {
-    padding: 6px 10px;
-    font-size: 0.72rem;
+    padding: 7px 10px;
+    font-size: 0.74rem;
   }
 }
