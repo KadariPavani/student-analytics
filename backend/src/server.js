@@ -43,23 +43,29 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-const server = app.listen(PORT, () => {
-  console.log('');
-  console.log('┌────────────────────────────────────────────┐');
-  console.log(`│  ✅  Server running on http://localhost:${PORT}  │`);
-  console.log('│  Press Ctrl+C to stop                      │');
-  console.log('└────────────────────────────────────────────┘');
-  console.log('');
-});
+// If started directly (node src/server.js), listen on the port. When imported (serverless), just export the app.
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    console.log('');
+    console.log('┌────────────────────────────────────────────┐');
+    console.log(`│  ✅  Server running on http://localhost:${PORT}  │`);
+    console.log('│  Press Ctrl+C to stop                      │');
+    console.log('└────────────────────────────────────────────┘');
+    console.log('');
+  });
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`❌ Port ${PORT} is already in use. Kill the existing process or use a different port.`);
-  } else {
-    console.error('❌ Server error:', err);
-  }
-  process.exit(1);
-});
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${PORT} is already in use. Kill the existing process or use a different port.`);
+    } else {
+      console.error('❌ Server error:', err);
+    }
+    process.exit(1);
+  });
+}
+
+// Export the app so it can be wrapped as a serverless function (Vercel)
+module.exports = app;
 
 // Catch unhandled errors so the server never silently dies
 process.on('uncaughtException', (err) => {

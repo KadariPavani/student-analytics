@@ -1,7 +1,9 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
+// In serverless environments, avoid creating a new pool on every invocation.
+// Reuse the pool across module reloads by storing it on the global object.
+const poolConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
   user: process.env.DB_USER || 'postgres',
@@ -10,11 +12,14 @@ const pool = new Pool({
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-});
+};
 
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
-  process.exit(-1);
-});
+if (!global.__pgPool) {
+  global.__pgPool = new Pool(poolConfig);
+  global.__pgPool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+    // Do not exit; let serverless provider manage restarts.
+  });
+}
 
-module.exports = pool;
+module.exports = global.__pgPool;
