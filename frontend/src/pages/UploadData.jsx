@@ -27,7 +27,9 @@ function UploadData() {
   }, [passoutYear, result]);
 
   const handleDownloadTemplate = () => {
-    window.open('http://localhost:5000/api/upload/template', '_blank');
+    // Use the same base URL as the API
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    window.open(`${baseUrl}/upload/template`, '_blank');
   };
 
   const handleUpload = async (e) => {
