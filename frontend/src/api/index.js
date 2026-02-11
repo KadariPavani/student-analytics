@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// Use Vite env var in production (set VITE_API_BASE in Vercel), fallback to localhost for local dev.
-const baseURL = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+// In production builds use same-origin /api; in dev fall back to local backend.
+const baseURL =
+  import.meta.env.VITE_API_BASE ||
+  (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
 
 const api = axios.create({
   baseURL,
