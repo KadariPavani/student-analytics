@@ -1,12 +1,7 @@
 import axios from 'axios';
 
-// In production builds use same-origin /api; in dev fall back to local backend.
-const baseURL =
-  import.meta.env.VITE_API_BASE ||
-  (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
-
 const api = axios.create({
-  baseURL,
+  baseURL: 'http://localhost:5000/api',
   timeout: 30000,
 });
 
