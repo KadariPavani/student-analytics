@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'placement-analytics-secret-key-change-in-production';
+const config = require('../config');
 
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -10,7 +9,7 @@ function authenticate(req, res, next) {
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, config.jwtSecret);
     req.user = decoded;
     next();
   } catch (err) {
@@ -25,4 +24,5 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-module.exports = { authenticate, requireAdmin, JWT_SECRET };
+module.exports = { authenticate, requireAdmin };
+
