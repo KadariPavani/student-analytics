@@ -48,6 +48,19 @@ const uploadsPath = process.env.VERCEL
   : path.join(__dirname, '..', 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Student Analytics API',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/api/health',
+      ping: '/api/ping',
+    },
+  });
+});
+
 // Debug endpoint (no DB) - for troubleshooting
 app.get('/api/ping', (req, res) => {
   res.json({
