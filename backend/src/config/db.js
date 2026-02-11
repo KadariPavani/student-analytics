@@ -24,10 +24,12 @@ function getPool() {
     const sql = neon(process.env.DATABASE_URL);
     
     // Create a pool-like interface that uses HTTP queries
+    // Use sql.query() for parameterized queries (not tagged template)
     pool = {
       query: async (text, params) => {
         try {
-          const rows = await sql(text, params || []);
+          // Use sql.query() for conventional parameterized queries
+          const rows = await sql.query(text, params || []);
           return { rows, rowCount: rows.length };
         } catch (err) {
           console.error('DB Query Error:', err.message, 'Query:', text);
@@ -36,7 +38,7 @@ function getPool() {
       },
       connect: async () => ({
         query: async (text, params) => {
-          const rows = await sql(text, params || []);
+          const rows = await sql.query(text, params || []);
           return { rows, rowCount: rows.length };
         },
         release: () => {},
