@@ -12,6 +12,10 @@ let pool;
 if (isServerless && process.env.DATABASE_URL) {
   // Use Neon's serverless driver on Vercel (WebSocket-based, handles cold starts)
   const { Pool: NeonPool, neonConfig } = require('@neondatabase/serverless');
+  const ws = require('ws');
+  
+  // Configure WebSocket for Node.js (Vercel uses Node runtime)
+  neonConfig.webSocketConstructor = ws;
   neonConfig.fetchConnectionCache = true;
   
   if (!global.__neonPool) {

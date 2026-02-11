@@ -27,6 +27,16 @@ const uploadsPath = process.env.VERCEL
   : path.join(__dirname, '..', 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
+// Debug endpoint (no DB) - for troubleshooting
+app.get('/api/ping', (req, res) => {
+  res.json({
+    ping: 'pong',
+    env: process.env.VERCEL ? 'vercel' : 'local',
+    hasDbUrl: !!process.env.DATABASE_URL,
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/students', studentsRouter);
@@ -35,8 +45,14 @@ app.use('/api/placements', placementsRouter);
 app.use('/api/batches', batchesRouter);
 app.use('/api/upload', uploadRouter);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', async (req, res) => {
+  try {
+    const pool = require('./config/db');
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected', timestamp: new Date().toISOString() });
+  } catch (err) {
+    res.status(500).json({ status: 'error', db: 'failed', error: err.message });
+  }
 });
 
 // Error handler for multer
