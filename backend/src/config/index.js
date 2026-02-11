@@ -1,6 +1,10 @@
 // Centralized configuration for backend
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
+
+// Only load dotenv locally — on Vercel, env vars come from the dashboard
+if (!process.env.VERCEL) {
+  require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
+}
 
 const config = {
   db: {
