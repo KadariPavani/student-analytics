@@ -8,8 +8,16 @@ const pool = require('../config/db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 
 // Configure multer for file uploads
-const uploadDir = path.join(__dirname, '..', '..', 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+// On Vercel (read-only FS) use /tmp; locally use project uploads/ folder
+const uploadDir = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '..', '..', 'uploads');
+
+try {
+  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+} catch {
+  // Silently ignore — directory may already exist or will be created on first upload
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
