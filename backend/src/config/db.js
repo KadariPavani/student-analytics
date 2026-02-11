@@ -13,7 +13,12 @@ let pool = null;
 function getPool() {
   if (pool) return pool;
 
-  if (isServerless && process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL is not set!');
+    throw new Error('DATABASE_URL environment variable is required');
+  }
+
+  if (isServerless) {
     // Use Neon's serverless driver with HTTP (not WebSocket) for simpler cold starts
     const { neon } = require('@neondatabase/serverless');
     const sql = neon(process.env.DATABASE_URL);
@@ -21,8 +26,13 @@ function getPool() {
     // Create a pool-like interface that uses HTTP queries
     pool = {
       query: async (text, params) => {
-        const rows = await sql(text, params || []);
-        return { rows, rowCount: rows.length };
+        try {
+          const rows = await sql(text, params || []);
+          return { rows, rowCount: rows.length };
+        } catch (err) {
+          console.error('DB Query Error:', err.message, 'Query:', text);
+          throw err;
+        }
       },
       connect: async () => ({
         query: async (text, params) => {
@@ -37,28 +47,13 @@ function getPool() {
     // Use standard pg driver locally
     const { Pool } = require('pg');
 
-    let poolConfig;
-    if (process.env.DATABASE_URL) {
-      poolConfig = {
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
-        max: 20,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 10000,
-      };
-    } else {
-      poolConfig = {
-        host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '5432'),
-        user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || 'postgres',
-        database: process.env.DB_NAME || 'student_analytics',
-        max: 20,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 10000,
-        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-      };
-    }
+    const poolConfig = {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
+    };
 
     if (!global.__pgPool) {
       global.__pgPool = new Pool(poolConfig);
